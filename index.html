@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Week 3 Homework: Statistical Inference for Single Variables</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#ffffff; --surface:#f4f5f7; --surface-2:#eceef1; --ink:#1d1f24; --muted:#5b6470;
+  --line:#d9dce1; --maroon:#8c1d2c; --maroon-soft:#f6e9eb; --on-maroon:#ffffff;
+  --seg1:#8c1d2c; --seg2:#a8394a; --seg3:#5b6470; --seg4:#7b8591; --seg5:#b98a3e; --seg6:#9a6f2c;
+  --ok:#2f6b4f;
+  color-scheme: light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#16171b; --surface:#1f2126; --surface-2:#272a30; --ink:#eceef1; --muted:#a3aab4;
+    --line:#353840; --maroon:#e0788a; --maroon-soft:#3a1e24; --on-maroon:#16171b;
+    --seg1:#c94a5e; --seg2:#e0788a; --seg3:#7f8996; --seg4:#a3aab4; --seg5:#d1a85c; --seg6:#b88d45;
+    --ok:#6fbf95; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#16171b; --surface:#1f2126; --surface-2:#272a30; --ink:#eceef1; --muted:#a3aab4;
+  --line:#353840; --maroon:#e0788a; --maroon-soft:#3a1e24; --on-maroon:#16171b;
+  --seg1:#c94a5e; --seg2:#e0788a; --seg3:#7f8996; --seg4:#a3aab4; --seg5:#d1a85c; --seg6:#b88d45;
+  --ok:#6fbf95; color-scheme: dark;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 64px);scroll-behavior:smooth}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}*{transition:none!important}}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 1rem/1.6 "Public Sans",system-ui,-apple-system,"Segoe UI",Arial,sans-serif;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+h1,h2,h3{font-family:"Newsreader",Georgia,"Times New Roman",serif;font-weight:600;line-height:1.15;margin:0}
+a{color:var(--maroon)}
+:focus-visible{outline:3px solid var(--maroon);outline-offset:2px;border-radius:4px}
+.wrap{max-width:960px;margin:0 auto;padding:0 1.25rem}
+
+/* nav */
+.nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
+.nav .wrap{display:flex;align-items:center;gap:1rem;height:56px;overflow-x:auto;scrollbar-width:none}
+.nav .wrap::-webkit-scrollbar{display:none}
+.nav .course{font-weight:700;color:var(--maroon);white-space:nowrap;font-size:.9rem}
+.nav a.l{color:var(--muted);text-decoration:none;font-size:.9rem;white-space:nowrap;padding:.25rem 0}
+.nav a.l:hover{color:var(--ink)}
+.nav .prog{margin-left:auto;white-space:nowrap;font-size:.85rem;color:var(--muted);display:flex;align-items:center;gap:.5rem}
+.nav .prog .bar{width:72px;height:6px;background:var(--surface-2);border-radius:3px;overflow:hidden}
+.nav .prog .bar i{display:block;height:100%;width:0;background:var(--ok);transition:width .3s}
+
+/* hero */
+header.hero{padding:3.5rem 0 2.5rem;border-bottom:1px solid var(--line)}
+.kicker{color:var(--maroon);font-weight:600;font-size:.95rem;margin:0 0 .75rem}
+.hero h1{font-size:clamp(2.1rem,5vw,3.4rem);max-width:16ch;letter-spacing:-.01em}
+.hero p.lede{font-size:1.15rem;color:var(--muted);max-width:60ch;margin:1.25rem 0 2rem}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.facts div{background:var(--bg);padding:1rem 1.1rem}
+.facts dt{font-size:.82rem;color:var(--muted);margin-bottom:.2rem}
+.facts dd{margin:0;font-weight:600}
+
+section{padding:3rem 0;border-bottom:1px solid var(--line)}
+section h2{font-size:clamp(1.6rem,3.2vw,2.1rem);margin-bottom:.6rem}
+section > .wrap > p.intro{color:var(--muted);max-width:62ch;margin:0 0 1.75rem}
+
+/* rules */
+.rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.25rem}
+.rule{border-left:3px solid var(--maroon);padding:.2rem 0 .2rem 1rem}
+.rule h3{font-family:"Public Sans",system-ui,sans-serif;font-size:1rem;font-weight:700;margin-bottom:.35rem}
+.rule ul{margin:0;padding-left:1.1rem;color:var(--ink)}
+.rule li{margin:.2rem 0}
+.honesty{margin-top:2rem;background:var(--maroon-soft);border-radius:10px;padding:1.25rem 1.4rem}
+.honesty strong{color:var(--maroon)}
+code,.file{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:.9em;background:var(--surface);padding:.1em .4em;border-radius:4px;word-break:break-all}
+
+/* issues tabs */
+.tabs{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.25rem}
+.tab{font:inherit;font-weight:600;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:.55rem 1.1rem;cursor:pointer}
+.tab[aria-selected="true"]{background:var(--maroon);border-color:var(--maroon);color:var(--on-maroon)}
+.panel{background:var(--surface);border-radius:12px;padding:1.6rem 1.6rem 1.4rem}
+.panel[hidden]{display:none}
+.panel h3{font-size:1.5rem;margin-bottom:.75rem}
+.panel .ctx{max-width:65ch}
+.panel .task{margin-top:1rem;padding-top:1rem;border-top:1px solid var(--line);max-width:65ch}
+.args{display:grid;gap:.75rem;margin:1rem 0 0}
+.arg{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:.9rem 1rem}
+.arg b{color:var(--maroon)}
+
+/* points bar */
+.pts{margin:0 0 2rem}
+.pts .bar{display:flex;height:56px;border-radius:10px;overflow:hidden;gap:2px}
+.pts button{all:unset;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.95rem;transition:filter .2s,transform .2s}
+.pts button:hover,.pts button:focus-visible{filter:brightness(1.12)}
+.pts button:focus-visible{outline:3px solid var(--ink);outline-offset:-3px}
+.pts .legend{display:flex;justify-content:space-between;font-size:.85rem;color:var(--muted);margin-top:.5rem}
+
+/* components */
+.comp{border:1px solid var(--line);border-radius:12px;margin-bottom:.9rem;background:var(--bg);overflow:hidden}
+.comp summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:auto 1fr auto;gap:1rem;align-items:center;padding:1.1rem 1.25rem}
+.comp summary::-webkit-details-marker{display:none}
+.comp .n{width:2.2rem;height:2.2rem;border-radius:50%;display:grid;place-items:center;font-family:"Newsreader",Georgia,serif;font-weight:600;font-size:1.2rem;color:#fff}
+.comp .t{font-weight:700;font-size:1.05rem}
+.comp .t small{display:block;font-weight:400;color:var(--muted);font-size:.9rem}
+.comp .p{font-weight:700;white-space:nowrap}
+.comp .p::after{content:"";display:inline-block;width:.5rem;height:.5rem;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg) translateY(-3px);margin-left:.9rem;transition:transform .2s}
+.comp[open] .p::after{transform:rotate(-135deg) translateY(-1px)}
+.comp .body{padding:0 1.25rem 1.4rem 4.45rem;max-width:calc(65ch + 4.45rem)}
+.comp .body ul{padding-left:1.1rem;margin:.4rem 0}
+.comp .body li{margin:.25rem 0}
+.comp .ex{background:var(--surface);border-radius:8px;padding:.85rem 1rem;margin:.9rem 0 0;font-size:.95rem}
+.comp .ex b{display:block;font-size:.82rem;color:var(--muted);font-weight:600;margin-bottom:.2rem}
+.comp.flash{box-shadow:0 0 0 3px var(--maroon)}
+@media (max-width:600px){.comp .body{padding-left:1.25rem}}
+
+.scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:.9rem 0;border:1px solid var(--line);border-radius:8px}
+table{border-collapse:collapse;width:100%;font-size:.92rem}
+th,td{text-align:left;vertical-align:top;padding:.65rem .8rem;border-bottom:1px solid var(--line)}
+th{background:var(--surface);font-weight:600;white-space:nowrap}
+tr:last-child td{border-bottom:0}
+.vt{min-width:760px}
+
+/* rubric */
+.bands{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:.75rem;margin-top:1.5rem}
+.band{border-radius:10px;padding:1rem 1.1rem;background:var(--surface)}
+.band .r{font-family:"Newsreader",Georgia,serif;font-size:1.5rem;font-weight:600}
+.band .g{font-size:.85rem;color:var(--muted);margin-bottom:.35rem}
+.band p{margin:0;font-size:.92rem}
+.band.top{background:var(--maroon-soft)}
+.band.top .r{color:var(--maroon)}
+
+/* mistakes */
+.mist{display:grid;gap:0;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.mist div{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.6fr);gap:1.5rem;padding:1rem 1.25rem;border-bottom:1px solid var(--line)}
+.mist div:last-child{border-bottom:0}
+.mist div:nth-child(odd){background:var(--surface)}
+.mist b{font-weight:600}
+.mist span{color:var(--muted)}
+@media (max-width:600px){.mist div{grid-template-columns:1fr;gap:.25rem}}
+
+/* checklist */
+.check{display:grid;gap:.5rem;max-width:720px}
+.check label{display:flex;gap:.85rem;align-items:flex-start;padding:.75rem 1rem;border:1px solid var(--line);border-radius:10px;cursor:pointer;transition:background .2s,border-color .2s}
+.check input{appearance:none;flex:none;width:1.3rem;height:1.3rem;margin:.1rem 0 0;border:2px solid var(--muted);border-radius:5px;display:grid;place-items:center;cursor:pointer}
+.check input:checked{background:var(--ok);border-color:var(--ok)}
+.check input:checked::after{content:"";width:.35rem;height:.65rem;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg) translate(-1px,-1px)}
+.check label:has(input:checked){background:var(--surface);border-color:transparent}
+.check label:has(input:checked) span{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--line)}
+.check .sub{margin-left:2.15rem}
+.checkhead{display:flex;align-items:center;gap:1rem;flex-wrap:wrap;margin-bottom:1.25rem}
+.checkhead .count{font-weight:700}
+.btn{font:inherit;font-weight:600;font-size:.9rem;background:none;border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:.4rem .9rem;cursor:pointer}
+.btn:hover{color:var(--ink);border-color:var(--muted)}
+.done-msg{color:var(--ok);font-weight:600}
+
+/* tips & resources */
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:2rem}
+.two h3{font-size:1.3rem;margin-bottom:.6rem}
+.two ul{padding-left:1.1rem;margin:0}
+.two li{margin:.35rem 0}
+.do{display:grid;gap:.6rem;margin-top:.5rem}
+.do div{font-size:.95rem;padding:.7rem .9rem;border-radius:8px;background:var(--surface)}
+.do s{color:var(--muted)}
+
+pre.data{position:relative;margin:.9rem 0;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:.9rem 1rem;overflow-x:auto;font:400 .85rem/1.55 ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+.copy{position:absolute;top:.5rem;right:.5rem;font:600 .8rem "Public Sans",system-ui,sans-serif;background:var(--bg);color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:.25rem .7rem;cursor:pointer}
+.copy:hover{color:var(--ink)}
+.scen{border-left:3px solid var(--maroon);padding:.1rem 0 .1rem 1rem;margin:0 0 1rem}
+.q{margin:1.4rem 0 .4rem;font-family:"Public Sans",system-ui,sans-serif;font-size:1rem;font-weight:700}
+.q span{color:var(--muted);font-weight:500}
+.body ol.sub{padding-left:1.3rem;margin:.4rem 0}
+.body ol.sub>li{margin:.55rem 0}
+.body ol.sub ul{margin:.25rem 0}
+.weights{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:.75rem;margin-top:1.5rem}
+.weights div{background:var(--surface);border-radius:10px;padding:.9rem 1rem}
+.weights .r{font-family:"Newsreader",Georgia,serif;font-size:1.5rem;font-weight:600}
+.weights p{margin:0;font-size:.92rem;color:var(--muted)}
+.ok-list li::marker{color:var(--ok)}
+.no-list li::marker{color:var(--maroon)}
+footer{padding:2.5rem 0 3rem;color:var(--muted);font-size:.9rem}
+@media print{.nav,.btn{display:none}.comp .body{display:block}details>*{display:block}}
+</style>
+</head>
+<body>
+
+<nav class="nav" aria-label="Assignment sections">
+  <div class="wrap">
+    <span class="course">BUAD-631-38</span>
+    <a class="l" href="#rules">Requirements</a>
+    <a class="l" href="#parts">Parts</a>
+    <a class="l" href="#rubric">Rubric</a>
+    <a class="l" href="#tips">Tips</a>
+    <a class="l" href="#checklist">Checklist</a>
+    <span class="prog" aria-live="polite"><span class="bar"><i id="navbar"></i></span><span id="navcount">0 of 0</span></span>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="kicker">Week 3 Homework, Statistical Inference for Single Variables</p>
+    <h1>Turn a sample into a decision you can defend</h1>
+    <p class="lede">Build confidence intervals, run one-sample t-tests, and explain what they mean for the business. You’ll judge a delivery promise, a marketing campaign, and a metric of your own, all in Python.</p>
+    <dl class="facts">
+      <div><dt>Due</dt><dd>Sun, Nov 15, 2026, 11:59pm</dd></div>
+      <div><dt>Points</dt><dd>50, plus 5 bonus</dd></div>
+      <div><dt>Estimated time</dt><dd>2 to 2.5 hours</dd></div>
+      <div><dt>You submit</dt><dd>One .ipynb and its PDF export</dd></div>
+    </dl>
+  </div>
+</header>
+
+<main>
+<section id="rules">
+  <div class="wrap">
+    <h2>Before you start</h2>
+    <p class="intro">Submissions that miss these requirements lose points before the content is even read.</p>
+    <div class="rules">
+      <div class="rule">
+        <h3>Files and submission</h3>
+        <ul>
+          <li>Jupyter Notebook (.ipynb) with all code, outputs, and markdown explanations</li>
+          <li>A PDF export of the completed notebook</li>
+          <li>Name it <span class="file">Week3_Inference_[YourLastName].ipynb</span></li>
+          <li>Example: <span class="file">Week3_Inference_Jones.ipynb</span></li>
+        </ul>
+      </div>
+      <div class="rule">
+        <h3>Notebook structure</h3>
+        <ul>
+          <li>Clear markdown section headers for each part and question</li>
+          <li>Comments in your code explaining key steps</li>
+          <li>Runs without errors from top to bottom</li>
+          <li>Visualizations clearly labeled and professional</li>
+        </ul>
+      </div>
+      <div class="rule">
+        <h3>What you’ll practice</h3>
+        <ul>
+          <li>Confidence intervals for a population mean</li>
+          <li>One-sample t-tests</li>
+          <li>Statistical vs. practical significance</li>
+          <li>Communicating uncertainty to stakeholders</li>
+        </ul>
+      </div>
+    </div>
+    <div class="honesty">
+      <strong>Academic integrity.</strong> This is an individual assignment. You may discuss concepts with classmates, use course materials and textbooks, and search online for Python syntax. You may not share code or written answers, copy solutions from online sources, or use AI to write your interpretations; using it to debug code is okay. Violations are reported per university policy.
+    </div>
+  </div>
+</section>
+
+<section id="parts">
+  <div class="wrap">
+    <h2>Three parts and a bonus</h2>
+    <p class="intro">Each part builds a complete analysis, from calculation to business recommendation. Select a segment to jump to that part.</p>
+
+    <div class="pts">
+      <div class="bar">
+        <button style="flex:20;background:var(--seg1)" data-go="c1" aria-label="Part 1, 20 points">20</button>
+        <button style="flex:20;background:var(--seg3)" data-go="c2" aria-label="Part 2, 20 points">20</button>
+        <button style="flex:10;background:var(--seg5)" data-go="c3" aria-label="Part 3, 10 points">10</button>
+        <button style="flex:5;background:var(--seg4);opacity:.8" data-go="c4" aria-label="Bonus, 5 points">+5</button>
+      </div>
+      <div class="legend"><span>Confidence intervals</span><span>50 points plus bonus</span><span>Your own data</span></div>
+    </div>
+
+    <details class="comp" id="c1" open>
+      <summary><span class="n" style="background:var(--seg1)">1</span><span class="t">Confidence intervals<small>E-commerce delivery performance</small></span><span class="p">20 pts</span></summary>
+      <div class="body">
+        <p class="scen">You’re the operations manager for an e-commerce company that promises delivery within 3 days on average. To check whether you’re meeting that promise, you randomly sample 45 recent orders and record delivery times in days.</p>
+        <pre class="data"><button class="copy" type="button">Copy</button><code>delivery_times = [
+    2.8, 3.2, 2.9, 3.5, 2.7, 3.1, 3.4, 2.6, 3.3, 3.0,
+    2.9, 3.6, 2.8, 3.2, 3.1, 2.7, 3.4, 3.0, 2.9, 3.3,
+    3.5, 2.8, 3.1, 2.9, 3.2, 3.0, 3.4, 2.7, 3.3, 3.1,
+    2.9, 3.2, 3.0, 3.5, 2.8, 3.1, 3.3, 2.9, 3.2, 3.0,
+    3.4, 2.8, 3.1, 3.3, 2.9
+]</code></pre>
+        <p class="q">1.1 Calculate and visualize <span>10 pts</span></p>
+        <ol class="sub" type="a">
+          <li><strong>Calculate in Python (3 pts):</strong> sample mean and standard deviation, and the 95% confidence interval for the true mean delivery time. Show every component: degrees of freedom, critical t-value, standard error, and margin of error.</li>
+          <li><strong>Visualize (4 pts):</strong> a professional chart showing the sample mean clearly marked, the 95% interval as error bars, the 3-day promise as a reference line, and proper labels, title, and legend.</li>
+          <li><strong>Interpret (3 pts):</strong> explain the interval in plain language for a non-technical executive.</li>
+        </ol>
+        <p class="q">1.2 Business decision and trade-offs <span>10 pts</span></p>
+        <ol class="sub" type="a">
+          <li><strong>(3 pts)</strong> Based on your interval, is there evidence the company is failing its 3-day promise? Explain using the interval.</li>
+          <li><strong>(3 pts)</strong> Your boss says, “The average is 3.05 days, so we’re basically meeting our promise. Close enough.” Respond in three or four sentences using statistical reasoning.</li>
+          <li><strong>(4 pts)</strong> Calculate the 95% interval using only the first 20 observations and compare it to the n = 45 interval. Explain to your boss why sample size matters and whether collecting more data would be worthwhile.</li>
+        </ol>
+      </div>
+    </details>
+
+    <details class="comp" id="c2">
+      <summary><span class="n" style="background:var(--seg3)">2</span><span class="t">Hypothesis testing<small>Marketing campaign effectiveness</small></span><span class="p">20 pts</span></summary>
+      <div class="body">
+        <p class="scen">Your company launched an email campaign to increase engagement. Historically, customers open an average of 12 marketing emails per month. After the campaign, you survey 60 randomly selected customers.</p>
+        <pre class="data"><button class="copy" type="button">Copy</button><code>emails_opened = [
+    14, 11, 15, 13, 12, 16, 10, 14, 13, 15, 12, 14, 11, 13, 16,
+    15, 12, 14, 13, 11, 15, 14, 12, 13, 16, 14, 15, 11, 13, 12,
+    14, 13, 15, 12, 14, 16, 13, 15, 11, 14, 12, 13, 15, 14, 16,
+    13, 12, 14, 15, 13, 11, 14, 15, 13, 12, 16, 14, 13, 15, 12
+]</code></pre>
+        <p class="q">2.1 Conduct a complete hypothesis test at α = 0.05 <span>12 pts</span></p>
+        <ol class="sub" type="a">
+          <li><strong>Hypotheses and test choice (3 pts):</strong> state H₀ and Hₐ, explain whether the test is one- or two-tailed and why, and state your significance level.</li>
+          <li><strong>Assumption checks (3 pts):</strong> a histogram or Q-Q plot to assess normality, a comment on whether assumptions are reasonably met, and a brief note on independence.</li>
+          <li><strong>Test execution (3 pts):</strong> use <code>scipy.stats.ttest_1samp()</code> for the test statistic and p-value, show code and output, and calculate the 95% interval for the true mean.</li>
+          <li><strong>Statistical conclusion (3 pts):</strong> reject or fail to reject H₀, explain what it means for the business without jargon, and report both the p-value and the interval.</li>
+        </ol>
+        <p class="q">2.2 Business impact analysis <span>8 pts</span></p>
+        <ol class="sub" type="a">
+          <li><strong>Type I and Type II errors (4 pts):</strong> describe what each error would mean here and its business consequence, then say which is worse for your company and why.</li>
+          <li><strong>Statistical vs. practical significance (4 pts):</strong> using the figures below, calculate whether the observed increase is practically significant and show your work. Then recommend whether to continue the campaign, using both statistical and business reasoning.
+            <ul>
+              <li>Campaign cost to develop and implement: $15,000</li>
+              <li>Revenue per additional email opened: $2.50 on average</li>
+              <li>Customers in the database: 50,000</li>
+            </ul>
+          </li>
+        </ol>
+      </div>
+    </details>
+
+    <details class="comp" id="c3">
+      <summary><span class="n" style="background:var(--seg5)">3</span><span class="t">Real-world application<small>Your organization’s data</small></span><span class="p">10 pts</span></summary>
+      <div class="body">
+        <p style="margin-top:0">Use real data from your organization, internship, or prior work. If you don’t have access to organizational data, use this retail dataset of average transaction values, where the historical average is $75.</p>
+        <pre class="data"><button class="copy" type="button">Copy</button><code>transaction_values = [
+    82, 71, 88, 79, 74, 85, 68, 91, 77, 83, 72, 86, 79, 81, 76,
+    84, 73, 89, 78, 80, 75, 87, 70, 85, 79, 81, 77, 83, 74, 88,
+    76, 82, 79, 86, 73, 81, 78, 84, 75, 80, 77, 85, 72, 83, 79,
+    81, 76, 87, 74, 82, 78, 84, 80, 75, 86, 73, 81, 79, 77, 85
+]</code></pre>
+        <p class="q">3.1 Complete analysis <span>6 pts</span></p>
+        <p style="margin:.2rem 0 .4rem">Run either a confidence interval or a hypothesis test, whichever fits your data best.</p>
+        <ol class="sub" type="a">
+          <li><strong>Context and data (1 pt):</strong> the metric and why it matters, the target or historical average you’re comparing against, and the data source and its limitations.</li>
+          <li><strong>Statistical analysis (3 pts):</strong> descriptive statistics, the inference procedure with all calculations in Python, and at least one assumption check.</li>
+          <li><strong>Visualization (2 pts):</strong> one professional chart suitable for management, with the interval or test result clearly marked.</li>
+        </ol>
+        <p class="q">3.2 Executive memo <span>4 pts</span></p>
+        <p style="margin:.2rem 0 .4rem">In 200 to 250 words, explain to your manager or executive team:</p>
+        <ul>
+          <li>What you analyzed and why it matters to the business</li>
+          <li>What you found, in plain language with no statistical jargon</li>
+          <li>What you recommend</li>
+          <li>Important caveats or limitations</li>
+        </ul>
+        <div class="ex"><b>Memo format</b>A TO / FROM / DATE / RE header, then background, findings, and recommendation, in executive-appropriate language.</div>
+      </div>
+    </details>
+
+    <details class="comp" id="c4">
+      <summary><span class="n" style="background:var(--seg4)">+</span><span class="t">Bonus: an inference function<small>Optional</small></span><span class="p">+5 pts</span></summary>
+      <div class="body">
+        <p style="margin-top:0">Write a reusable function that runs a complete inference analysis, starting from this skeleton:</p>
+        <pre class="data"><button class="copy" type="button">Copy</button><code>def inference_report(data, target_value, test_type='two-tailed',
+                     confidence_level=0.95, alpha=0.05):
+    """
+    Performs complete statistical inference analysis and returns formatted results.
+
+    Parameters:
+    -----------
+    data : array-like
+        Sample data
+    target_value : float
+        Hypothesized population mean (for hypothesis test)
+    test_type : str
+        'two-tailed', 'greater', or 'less' (default: 'two-tailed')
+    confidence_level : float
+        Confidence level for interval (default 0.95)
+    alpha : float
+        Significance level for hypothesis test (default 0.05)
+
+    Returns:
+    --------
+    Prints formatted report with:
+        - Descriptive statistics
+        - Confidence interval
+        - Hypothesis test results
+        - Interpretation
+    """
+    # Your code here
+    pass</code></pre>
+        <ul>
+          <li>Calculate descriptive statistics: mean, standard deviation, and n</li>
+          <li>Compute the confidence interval with the proper t-value</li>
+          <li>Run a one-sample t-test that handles one-tailed and two-tailed tests</li>
+          <li>Print the results as a clear, formatted report</li>
+          <li>Handle invalid inputs with error checking</li>
+          <li>Test it on at least one homework dataset and show the output</li>
+        </ul>
+      </div>
+    </details>
+  </div>
+</section>
+
+<section id="rubric">
+  <div class="wrap">
+    <h2>How it’s graded</h2>
+    <p class="intro">Points are awarded by part. Code quality counts throughout, not as a separate line.</p>
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Component</th><th>Points</th><th>Key criteria</th></tr></thead>
+        <tbody>
+          <tr><td>1. Confidence intervals</td><td>20</td><td>Correct calculations (10), business interpretation (6), understanding of trade-offs (4)</td></tr>
+          <tr><td>2. Hypothesis testing</td><td>20</td><td>Complete test procedure (12), business impact analysis (8)</td></tr>
+          <tr><td>3. Real-world application</td><td>10</td><td>Appropriate analysis (6), professional communication (4)</td></tr>
+          <tr><td>Code quality</td><td>Integrated</td><td>Clean, documented, error-free code throughout</td></tr>
+          <tr><td>Bonus</td><td>+5</td><td>Working function with proper implementation and testing</td></tr>
+          <tr><td><strong>Total</strong></td><td><strong>50 (+5)</strong></td><td></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="weights">
+      <div><div class="r">40%</div><p>Code functionality and correctness</p></div>
+      <div><div class="r">35%</div><p>Statistical interpretation and reasoning</p></div>
+      <div><div class="r">20%</div><p>Business communication and insights</p></div>
+      <div><div class="r">5%</div><p>Code documentation and presentation</p></div>
+    </div>
+    <div class="bands">
+      <div class="band top"><div class="r">90–100%</div><div class="g">Excellent</div><p>All calculations correct and shown; clear, business-focused interpretations; professional visuals; clean, commented code that runs perfectly.</p></div>
+      <div class="band"><div class="r">80–89%</div><div class="g">Good</div><p>Minor calculation errors; interpretations accurate with some jargon; adequate visuals; working code that lacks some documentation.</p></div>
+      <div class="band"><div class="r">70–79%</div><div class="g">Satisfactory</div><p>Right approach with some errors; interpretations lack clarity; basic visuals; code works but is hard to follow.</p></div>
+      <div class="band"><div class="r">Below 70%</div><div class="g">Needs improvement</div><p>Significant errors or missing work; conceptual misunderstanding; missing visuals; code that doesn’t run.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="tips">
+  <div class="wrap">
+    <h2>Tips for success</h2>
+    <p class="intro">Every analysis should connect to a real business decision. Don’t just report statistics; explain what they mean and what should be done.</p>
+    <div class="mist">
+      <div><b>State hypotheses first</b><span>Write H₀ and Hₐ before you run any test.</span></div>
+      <div><b>Check assumptions</b><span>Don’t skip it. A plot and a sentence are enough to show you looked.</span></div>
+      <div><b>Two kinds of significance</b><span>A result can be statistically significant and still not worth the money. Address both.</span></div>
+      <div><b>Write for the audience</b><span>Your reader is a business professional, not a statistician. Be honest about limitations and make a clear recommendation.</span></div>
+      <div><b>Readable code</b><span>Use meaningful variable names, comment your thinking, and print intermediate results to verify them.</span></div>
+      <div><b>Visuals matter</b><span>Budget real time for them. A chart that management can read at a glance earns its points.</span></div>
+      <div><b>Show your work</b><span>Include code, outputs, and explanations. Partial credit depends on seeing your thinking.</span></div>
+      <div><b>Portfolio quality</b><span>Treat this as something you’d be proud to show a future employer.</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="checklist">
+  <div class="wrap">
+    <h2>Submission checklist</h2>
+    <p class="intro">Check items off as you go. Your progress is saved in this browser.</p>
+    <div class="checkhead">
+      <span class="count" id="count">0 of 0 complete</span>
+      <button class="btn" id="reset" type="button">Clear checklist</button>
+      <span class="done-msg" id="done" hidden>Ready to upload to Canvas.</span>
+    </div>
+    <div class="check" id="checks">
+      <label><input type="checkbox" data-k="p1"><span>Part 1 complete: 1.1 a–c and 1.2 a–c</span></label>
+      <label><input type="checkbox" data-k="p2"><span>Part 2 complete: 2.1 a–d and 2.2 a–b</span></label>
+      <label><input type="checkbox" data-k="p3"><span>Part 3 complete: analysis, visualization, and executive memo</span></label>
+      <label><input type="checkbox" data-k="run"><span>All code runs without errors from top to bottom</span></label>
+      <label><input type="checkbox" data-k="viz"><span>All visualizations clearly labeled and professional</span></label>
+      <label><input type="checkbox" data-k="write"><span>Written responses in complete sentences with business context</span></label>
+      <label><input type="checkbox" data-k="jargon"><span>Statistical interpretations avoid jargon</span></label>
+      <label><input type="checkbox" data-k="headers"><span>Clear markdown section headers</span></label>
+      <label><input type="checkbox" data-k="comments"><span>Code comments explain key steps</span></label>
+      <label><input type="checkbox" data-k="name"><span>Notebook named <span class="file">Week3_Inference_[YourLastName].ipynb</span></span></label>
+      <label><input type="checkbox" data-k="pdf"><span>Both .ipynb and .pdf versions ready</span></label>
+      <label><input type="checkbox" data-k="review"><span>Reviewed for accuracy and completeness</span></label>
+      <label><input type="checkbox" data-k="up"><span>Uploaded to Canvas before Sun, Nov 15 at 11:59pm</span></label>
+    </div>
+  </div>
+</section>
+
+<section id="resources">
+  <div class="wrap">
+    <h2>Getting help</h2>
+    <div class="two">
+      <div>
+        <h3>Course resources</h3>
+        <ul>
+          <li>Week 3 lecture notes and async module</li>
+          <li>Utts/Heckard Chapter 9</li>
+          <li>Ayers Chapter 3</li>
+          <li>Discussion forum: post questions, but no spoilers</li>
+        </ul>
+        <div class="do">
+          <div><s>“The 95% CI is (41.2, 46.8)”</s> becomes “we can be 95% confident the average wait time for all customers is between about 41 and 47 minutes.”</div>
+        </div>
+      </div>
+      <div>
+        <h3>Python documentation</h3>
+        <ul>
+          <li><a href="https://docs.scipy.org/doc/scipy/reference/stats.html" target="_blank" rel="noopener">scipy.stats reference</a></li>
+          <li><a href="https://matplotlib.org/stable/" target="_blank" rel="noopener">matplotlib documentation</a></li>
+        </ul>
+        <p style="color:var(--muted);margin-top:1rem">Start early. Real thought is required, not just calculations, and questions are easier to answer before the last day.</p>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">University of Redlands School of Business. BUAD-631-38: Data Driven Decision-Making, Professor Murray. Questions: <a href="mailto:cheyne_murray@redlands.edu">cheyne_murray@redlands.edu</a></div>
+</footer>
+
+<script>
+(function(){
+  // Tabs
+  const tabs=[...document.querySelectorAll('.tab')];
+  function select(t,focus){
+    tabs.forEach(x=>{const on=x===t;x.setAttribute('aria-selected',on);x.tabIndex=on?0:-1;
+      document.getElementById(x.getAttribute('aria-controls')).hidden=!on;});
+    if(focus)t.focus();
+  }
+  tabs.forEach((t,i)=>{
+    t.addEventListener('click',()=>select(t));
+    t.addEventListener('keydown',e=>{
+      if(e.key==='ArrowRight'||e.key==='ArrowLeft'){e.preventDefault();
+        select(tabs[(i+(e.key==='ArrowRight'?1:-1)+tabs.length)%tabs.length],true);}
+    });
+  });
+
+  // Points bar jumps to and opens a component
+  document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>{
+    const d=document.getElementById(b.dataset.go);
+    d.open=true; d.scrollIntoView({block:'start'});
+    d.classList.add('flash'); setTimeout(()=>d.classList.remove('flash'),1200);
+  }));
+
+  // Checklist with per-browser memory
+  const KEY='buad631-38-hw3-checklist';
+  const boxes=[...document.querySelectorAll('#checks input')];
+  let saved={};
+  try{saved=JSON.parse(localStorage.getItem(KEY)||'{}')||{};}catch(e){saved={};}
+  boxes.forEach(b=>{b.checked=!!saved[b.dataset.k];});
+  function update(){
+    const n=boxes.filter(b=>b.checked).length, t=boxes.length;
+    document.getElementById('count').textContent=n+' of '+t+' complete';
+    document.getElementById('navcount').textContent=n+' of '+t;
+    document.getElementById('navbar').style.width=(n/t*100)+'%';
+    document.getElementById('done').hidden=n!==t;
+    const s={}; boxes.forEach(b=>{if(b.checked)s[b.dataset.k]=1;});
+    try{localStorage.setItem(KEY,JSON.stringify(s));}catch(e){}
+  }
+  boxes.forEach(b=>b.addEventListener('change',update));
+  document.getElementById('reset').addEventListener('click',()=>{boxes.forEach(b=>b.checked=false);update();});
+  update();
+
+  // Copy buttons on datasets
+  document.querySelectorAll('.copy').forEach(b=>b.addEventListener('click',async()=>{
+    const txt=b.nextElementSibling.textContent;
+    try{await navigator.clipboard.writeText(txt);b.textContent='Copied';}
+    catch(e){const r=document.createRange();r.selectNodeContents(b.nextElementSibling);const s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent='Selected';}
+    setTimeout(()=>b.textContent='Copy',1500);
+  }));
+})();
+</script>
+</body>
+</html>
